@@ -8,7 +8,8 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         try {
             MainMenu mainMenu = new MainMenu();
-            mainMenu.getTerminalSize();
+            mainMenu.init_menu();
+            mainMenu.display_menu();
         } catch (IOException e) {
             System.err.println("Error: " + e.getMessage());
         }

@@ -6,12 +6,34 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 public class MainMenu {
-    public void getTerminalSize() throws IOException, InterruptedException {
-        // Linux/Mac command to set terminal size
-        // Using jline or jansi libraries
-        Terminal terminal = TerminalBuilder.terminal();
-        int width = terminal.getWidth();
-        int height = terminal.getHeight();
+    Terminal terminal;
+    int width;
+    int height;
+    boolean isWindows = isWindows();
+
+    public MainMenu() throws IOException {
+        this.terminal = TerminalBuilder.terminal();
+        this.width = terminal.getWidth();
+        this.height = terminal.getHeight();
+    }
+    public boolean isWindows(){
+        String os = System.getProperty("os.name").toLowerCase();
+        return os.contains("win");
+    }
+    public void enableAnsii() {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "ansicon");
+            processBuilder.inheritIO();
+            processBuilder.start();
+        } catch (IOException e) {
+            System.err.println("Error enabling ANSI support: " + e.getMessage());
+        }
+    }
+
+    public void init_menu() {
+        if (isWindows) {
+            enableAnsii();
+        }
         System.out.print("\u001B[2J\u001B[H\u001B[?25l\u2554"); // Clear the screen
 
         for (int i=1;i<width-1;i++){
@@ -30,6 +52,24 @@ public class MainMenu {
             System.out.print("\u2550");
         }
         System.out.print("\u255D");
-        Thread.sleep(1000);
+    }
+
+    public void display_menu() throws InterruptedException {
+        System.out.print("\u001B[H\u001B[1B\u001B[1C");
+        String message = "Welcome to the Airline Reservation System";
+        int startPosition = (width - message.length()) / 2;
+        System.out.print("\u001B[" + (2) + ";" + startPosition + "H");
+        System.out.print(message);
+
+        System.out.print("\u001b[" + height + ";" + width + "f");
+        Thread.sleep(10000000000L);
+    }
+
+    public Terminal getTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(Terminal terminal) {
+        this.terminal = terminal;
     }
 }
