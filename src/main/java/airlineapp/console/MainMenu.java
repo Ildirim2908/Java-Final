@@ -1,19 +1,24 @@
 package airlineapp.console;
 
+import airlineapp.console.ButtonInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 public class MainMenu {
+    List<ButtonInfo> buttons = new ArrayList<>();
     Terminal terminal;
     int width;
     int height;
     boolean isWindows = isWindows();
+    int currentheight = 2;
 
     public boolean isWindows(){
         String os = System.getProperty("os.name").toLowerCase();
@@ -94,21 +99,61 @@ public class MainMenu {
     }
 
     public void display_menu() throws InterruptedException {
+        int total_str_len;
         System.out.print("\u001B[H\u001B[1B\u001B[1C");
-        String message = "Welcome to the Airline Reservation System" + width + " " +height;
-        int startPosition = (width - message.length()) / 2;
-        System.out.print("\u001B[" + (2) + ";" + startPosition + "H");
-        System.out.print(message);
+        String message1 = "Welcome to the Airline Reservation System";
+        String message2;
+        System.out.print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        System.out.print(message1);
+
+        //login and register button
+        currentheight++;
+        message1 = "Login";
+        message2 = "Register";
+        total_str_len = message1.length() + message2.length() + 8 + 3;
+
+        buttons.add(new ButtonInfo("Login",(width - total_str_len)/2, currentheight));
+        buttons.add(new ButtonInfo("Register",((width - total_str_len)/2 + 7 + message1.length()), currentheight));
+
+        System.out.print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
+        System.out.print("\u2554");
+        for (int i=0; i<message1.length() + 2;i++){
+            System.out.print("\u2550");
+        }
+        System.out.print("\u2557" + "   ");
+
+        System.out.print("\u2554");
+        for (int i=0; i<message2.length() + 2;i++){
+            System.out.print("\u2550");
+        }
+        System.out.print("\u2557");
+
+        System.out.print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
+        System.out.print("\u2551");
+        System.out.print(" " + message1 + " ");
+        System.out.print("\u2551" + "   ");
+
+        System.out.print("\u2551");
+        System.out.print(" " + message2 + " ");
+        System.out.print("\u2551");
+
+        System.out.print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
+
+        System.out.print("\u255A");
+        for (int i=0; i<message1.length() + 2;i++){
+            System.out.print("\u2550");
+        }
+        System.out.print("\u255D" + "   ");
+
+        System.out.print("\u255A");
+        for (int i=0; i<message2.length() + 2;i++){
+            System.out.print("\u2550");
+        }
+        System.out.print("\u255D");
 
         System.out.print("\u001b[" + height + ";" + width + "f");
+
         Thread.sleep(10000000000L);
     }
 
-    public Terminal getTerminal() {
-        return terminal;
-    }
-
-    public void setTerminal(Terminal terminal) {
-        this.terminal = terminal;
-    }
 }
