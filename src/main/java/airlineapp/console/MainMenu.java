@@ -26,33 +26,14 @@ public class MainMenu {
         return os.contains("win");
     }
     public void enableAnsii() {
-        if (!isWindows) {
-            return; // ANSI is supported natively on non-Windows systems
-        }
-    
         try {
-            // Load the kernel32 library
-            Kernel32 kernel32 = Native.load("kernel32", Kernel32.class);
-    
-            // Get the console handle
-            long consoleHandle = kernel32.GetStdHandle(Kernel32.STD_OUTPUT_HANDLE);
-    
-            // Enable virtual terminal processing
-            int mode = kernel32.GetConsoleMode(consoleHandle);
-            kernel32.SetConsoleMode(consoleHandle, mode | Kernel32.ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-        } catch (Exception e) {
-            System.err.println("Error enabling ANSI support: " + e.getMessage());
+            new ProcessBuilder("cmd", "/c", "echo \u001B[?25h")
+                .inheritIO()
+                .start()
+                .waitFor();
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Failed to enable ANSI for this session.");
         }
-    }
-    
-    // Define the Kernel32 interface for JNA
-    public interface Kernel32 extends Library {
-        int STD_OUTPUT_HANDLE = -11;
-        int ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
-    
-        long GetStdHandle(int nStdHandle);
-        int GetConsoleMode(long hConsoleHandle);
-        boolean SetConsoleMode(long hConsoleHandle, int dwMode);
     }
 
     public void init_menu() {
