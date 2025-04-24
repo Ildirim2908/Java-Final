@@ -4,12 +4,11 @@ import java.io.IOException;
 
 import airlineapp.console.MainMenu;
 
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 public class Main {
+
     public static void main(String[] args) throws InterruptedException, IOException {
         Terminal terminal = TerminalBuilder.builder()
             .jna(true) // important for raw mode
@@ -19,21 +18,21 @@ public class Main {
         terminal.enterRawMode();
         
         MainMenu mainMenu = new MainMenu(terminal);
-        mainMenu.init_menu();
-        mainMenu.display_login_screen();
+        mainMenu.display_login_and_register_screen();
 
         while (true) {
-            int key = terminal.reader().read(); // reads one key at a time
-
-            if (key == 9) { // ASCII code for Tab is 9
-                mainMenu.onTabKeyPressed();
-            } else if (key == 'q') {
-                System.out.println("\nQuit detected.");
-                break;
-            } else {
-                System.out.println("Key pressed: " + (char) key + " (" + key + ")");
+            int key = terminal.reader().read();
+            switch (key) {
+                case 9 -> // ASCII code for Tab is 9
+                    mainMenu.onTabKeyPressed();
+                case 27 -> {
+                    mainMenu.exitProgram();
+                }
+                case 13 ->
+                    mainMenu.onEnterKeyPressed();
+                default -> {
+                }
             }
         }
-        terminal.close();
     }
 }
