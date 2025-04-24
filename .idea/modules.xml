@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IldirimsPart/IldirimsPart.iml" filepath="$PROJECT_DIR$/IldirimsPart/IldirimsPart.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/JavaFinal.iml" filepath="$PROJECT_DIR$/.idea/JavaFinal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Java-Final.iml" filepath="$PROJECT_DIR$/.idea/Java-Final.iml" />
     </modules>
   </component>
 </project>
