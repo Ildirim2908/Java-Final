@@ -2,12 +2,13 @@ package airlineapp;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
+import airlineapp.DAO.FlightDAO;
 import airlineapp.console.MainMenu;
-import airlineapp.model.Flight;
 import airlineapp.model.Passanger;
 
 public class Main {
@@ -23,12 +24,21 @@ public class Main {
         MainMenu mainMenu = new MainMenu(terminal);
         mainMenu.display_login_and_register_screen();
 
-        mainMenu.passangers.add(new Passanger("nigga"));
-        mainMenu.flights.add(new Flight("1", "New York", LocalDateTime.of(2023, 10, 1, 10, 0), 100, 50));
-        mainMenu.flights.add(new Flight("2", "Los Angeles", LocalDateTime.of(2023, 10, 2, 12, 0), 200, 100));
-        mainMenu.flights.add(new Flight("3", "Chicago", LocalDateTime.of(2023, 10, 3, 14, 0), 150, 75));
-        mainMenu.flights.add(new Flight("4", "Miami", LocalDateTime.of(2023, 10, 4, 16, 0), 120, 60));
-        mainMenu.flights.add(new Flight("5", "Houston", LocalDateTime.of(2023, 10, 5, 18, 0), 180, 90));
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        String formattedDateTime = dateTime.format(formatter); 
+
+        mainMenu.passangers.add(new Passanger("kenan"));
+        mainMenu.passangers.add(new Passanger("nezrin"));
+        mainMenu.passangers.add(new Passanger("ildirim"));
+        mainMenu.passangers.add(new Passanger("fuad"));
+        FlightDAO flightDAO = new FlightDAO();
+        flightDAO.generateSampleFlights();
+        flightDAO.generateSampleFlights();
+        flightDAO.generateSampleFlights();
+        flightDAO.generateSampleFlights();
+
+
         while (true) {
             int key = terminal.reader().read();
             switch (key) {

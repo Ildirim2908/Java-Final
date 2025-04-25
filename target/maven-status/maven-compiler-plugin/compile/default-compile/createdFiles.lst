@@ -1,4 +1,5 @@
 airlineapp/Main.class
+airlineapp/DAO/FlightDAO.class
 airlineapp/console/MainMenu.class
 airlineapp/model/Passanger.class
 airlineapp/console/ButtonInfo.class

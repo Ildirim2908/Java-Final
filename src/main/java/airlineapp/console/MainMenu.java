@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jline.terminal.Terminal;
 
+import airlineapp.DAO.FlightDAO;
 import airlineapp.model.Flight;
 import airlineapp.model.Passanger;
 
@@ -18,7 +19,9 @@ public class MainMenu {
 
     List<ButtonInfo> buttons = new ArrayList<>();
     public List<Passanger> passangers = new ArrayList<>();
-    public List<Flight> flights = new ArrayList<>();
+
+    FlightDAO flightDAO = new FlightDAO();
+    public List<Flight> flights = flightDAO.getAllFlights();
 
     int currentButtonIndex = -1;
 
@@ -123,7 +126,7 @@ public class MainMenu {
     }
     
     public void OutputFlight (String id, String From, String To, String DepartureTime, int AvailableSeats) throws IOException {
-        String line = String.format("%-3s %-15s %-15s %-20s %-3s",id + ":", From, To, DepartureTime, AvailableSeats);
+        String line = String.format("%-5s %-15s %-15s %-20s %-3s",id + ":", From, To, DepartureTime, AvailableSeats);
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
         terminal.writer().print(line);
         terminal.flush();
@@ -368,7 +371,7 @@ public class MainMenu {
                         }
                         char_buffer_c_index=5;
                         terminal.writer().print("\u001B[" + (6) + ";" + (((width - 15) / 2) + 1) + "H");
-                        terminal.writer().print(char_buffer_c_index + "\u001B[" + (6) + ";" + (((width - 15) / 2) + 6) + "H");
+                        terminal.writer().print("ERROR       " + "\u001B[" + (6) + ";" + (((width - 15) / 2) + 6) + "H");
                         terminal.flush();
                         
                     }
@@ -526,12 +529,14 @@ public class MainMenu {
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
         OutputButtons(message1);
         currentheight++;
-        String line = String.format("%-3s %-15s %-15s %-20s %-3s","ID", "From", "To", "DepartureTime", "AvailableSeats");
+        String line = String.format("%-5s %-15s %-15s %-20s %-3s","ID", "From", "To", "DepartureTime", "AvailableSeats");
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
         terminal.writer().print(line);
         terminal.flush();
         for (Flight k : flights){
-            OutputFlight(k.getFlightID(), "Kiev", k.getDestination(), k.getDeparturetime().toString(), k.getAvailableSeats());
+            String DepartureTime = k.getDeparturetime().toString();
+            DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('.'));
+            OutputFlight(k.getFlightID(), k.getFrom(), k.getDestination(), DepartureTime, k.getAvailableSeats());
         }
         terminal.flush();
     }

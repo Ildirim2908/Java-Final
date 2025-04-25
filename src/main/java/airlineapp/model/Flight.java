@@ -1,11 +1,12 @@
 package airlineapp.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.io.Serializable;
 
 
-
-public class Flight {
-    private String From
+public class Flight implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String From;
     private String flightID;
     private String destination;
     private LocalDateTime departuretime;
