@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.jline.terminal.Terminal;
 
+import airlineapp.model.Flight;
 import airlineapp.model.Passanger;
-
 
 public class MainMenu {
     
@@ -18,6 +18,7 @@ public class MainMenu {
 
     List<ButtonInfo> buttons = new ArrayList<>();
     public List<Passanger> passangers = new ArrayList<>();
+    public List<Flight> flights = new ArrayList<>();
 
     int currentButtonIndex = -1;
 
@@ -33,6 +34,7 @@ public class MainMenu {
     String currentMenu = "Login_or_Register"; //By default first we will be in login menu
 
     boolean is_login_register_buttons_added = false;
+    boolean is_user_dashboard_buttons_added = false;
 
     public void exitProgram() throws InterruptedException, IOException{
         if("Login_or_Register".equals(currentMenu)){
@@ -54,7 +56,7 @@ public class MainMenu {
         this.terminal = terminal;
         this.width = terminal.getWidth();
         this.height = terminal.getHeight();
-        height = (height > 30) ? 30 : height;
+        height = (height > 60) ? 60 : height;
     }
 
     public void OutputButtons (String message1, String message2, int space_between_buttons) throws IOException {
@@ -117,6 +119,13 @@ public class MainMenu {
             terminal.writer().print("\u2550");
         }
         terminal.writer().print("\u255D");
+        terminal.flush();
+    }
+    
+    public void OutputFlight (String id, String From, String To, String DepartureTime, int AvailableSeats) throws IOException {
+        String line = String.format("%-3s %-15s %-15s %-20s %-3s",id + ":", From, To, DepartureTime, AvailableSeats);
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
+        terminal.writer().print(line);
         terminal.flush();
     }
     //basic border for the menu
@@ -236,8 +245,7 @@ public class MainMenu {
             }
 
             else if (buttonName.equals("Online-Board")) {
-                // Handle online board action
-                System.out.println("Online-Board button pressed");
+                display_online_board();
             } else if (buttonName.equals("Show Flight Info")) {
                 // Handle show flight info action
                 System.out.println("Show Flight Info button pressed");
@@ -484,23 +492,47 @@ public class MainMenu {
         message1 = "Online-Board";
         message2 = "Show Flight Info";
         total_str_len = message1.length() + message2.length() + 8 + 8;
-        buttons.add(new ButtonInfo("Online-Board",(width - total_str_len)/2, currentheight));
-        buttons.add(new ButtonInfo("Show Flight Info",((width - total_str_len)/2 + 12 + message1.length()), currentheight));
+        if(!is_user_dashboard_buttons_added){
+            buttons.add(new ButtonInfo("Online-Board",(width - total_str_len)/2, currentheight));
+            buttons.add(new ButtonInfo("Show Flight Info",((width - total_str_len)/2 + 12 + message1.length()), currentheight));
+        }
         OutputButtons(message1, message2, 8);
 
         currentheight+=2;
         message1 = "Book Flight";
         total_str_len = message1.length() + 4;
-        buttons.add(new ButtonInfo("Book Flight",(width - total_str_len)/2, currentheight));
+        if(!is_user_dashboard_buttons_added){
+            buttons.add(new ButtonInfo("Book Flight",(width - total_str_len)/2, currentheight));
+        }
         OutputButtons(message1);
 
         currentheight+=2;
         message1 = "Cancel Flight";
         message2 = "My Flights";
         total_str_len = message1.length() + message2.length() + 8 + 8;
-        buttons.add(new ButtonInfo("Cancel Flight",(width - total_str_len)/2, currentheight));
-        buttons.add(new ButtonInfo("My Flights",((width - total_str_len)/2 + 12 + message1.length()), currentheight));
+        if(!is_user_dashboard_buttons_added){
+            is_user_dashboard_buttons_added = true;
+            buttons.add(new ButtonInfo("Cancel Flight",(width - total_str_len)/2, currentheight));
+            buttons.add(new ButtonInfo("My Flights",((width - total_str_len)/2 + 12 + message1.length()), currentheight));
+        }
         OutputButtons(message1, message2, 8);
     }
 
+    public void display_online_board() throws IOException, InterruptedException{
+        init_menu();
+        currentMenu = "Online-Board";
+        currentheight++;
+        String message1 = "Online Board";
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        OutputButtons(message1);
+        currentheight++;
+        String line = String.format("%-3s %-15s %-15s %-20s %-3s","ID", "From", "To", "DepartureTime", "AvailableSeats");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
+        terminal.writer().print(line);
+        terminal.flush();
+        for (Flight k : flights){
+            OutputFlight(k.getFlightID(), "Kiev", k.getDestination(), k.getDeparturetime().toString(), k.getAvailableSeats());
+        }
+        terminal.flush();
+    }
 }
