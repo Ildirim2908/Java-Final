@@ -1,16 +1,12 @@
 package airlineapp.console;
 
-import airlineapp.model.Passanger;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 
 import org.jline.terminal.Terminal;
+
+import airlineapp.model.Passanger;
 
 
 public class MainMenu {
@@ -21,11 +17,11 @@ public class MainMenu {
     String currentUser = new String();
 
     List<ButtonInfo> buttons = new ArrayList<>();
-    List<Passanger> passangers = new ArrayList<>();
+    public List<Passanger> passangers = new ArrayList<>();
 
     int currentButtonIndex = -1;
 
-    private Terminal terminal;
+    private final Terminal terminal;
 
 
     boolean isLogin = false;
@@ -36,11 +32,22 @@ public class MainMenu {
 
     String currentMenu = "Login_or_Register"; //By default first we will be in login menu
 
-    public void exitProgram(){
-        terminal.writer().print("\u001B[" + height + ";" + width + "H");
-        terminal.flush();
-        System.out.println("\nQuit detected.");
-        System.exit(0);
+    boolean is_login_register_buttons_added = false;
+
+    public void exitProgram() throws InterruptedException, IOException{
+        if("Login_or_Register".equals(currentMenu)){
+            terminal.writer().print("\u001B[" + height + ";" + width + "H");
+            terminal.flush();
+            System.out.println("\nQuit detected.");
+            System.exit(0);
+        }
+        else if("Login".equals(currentMenu) || "Register".equals(currentMenu)){
+            display_login_and_register_screen();
+        }
+        else if("User_Dashboard".equals(currentMenu)){
+            display_login_and_register_screen();
+            isLogin = false;
+        }
     }
     
     public MainMenu(Terminal terminal) throws IOException {
@@ -48,6 +55,69 @@ public class MainMenu {
         this.width = terminal.getWidth();
         this.height = terminal.getHeight();
         height = (height > 30) ? 30 : height;
+    }
+
+    public void OutputButtons (String message1, String message2, int space_between_buttons) throws IOException {
+
+        int total_width;
+
+        total_width = message1.length() + message2.length() + 8 + space_between_buttons;
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_width) / 2)  + "H");
+
+        terminal.writer().print("\u2554");
+        for (int i=0; i<message1.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u2557" + " ".repeat(space_between_buttons));
+        terminal.writer().print("\u2554");
+        for (int i=0; i<message2.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u2557");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_width) / 2)  + "H");
+        terminal.writer().print("\u2551");
+        terminal.writer().print(" " + message1 + " ");
+        terminal.writer().print("\u2551" + " ".repeat(space_between_buttons));
+        terminal.writer().print("\u2551");
+        terminal.writer().print(" " + message2 + " ");
+        terminal.writer().print("\u2551");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_width) / 2)  + "H");
+        terminal.writer().print("\u255A");
+        for (int i=0; i<message1.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u255D" + " ".repeat(space_between_buttons));
+        terminal.writer().print("\u255A");
+        for (int i=0; i<message2.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u255D");
+        terminal.flush();
+    }
+    
+    public void OutputButtons (String message1) throws IOException {
+
+        int total_width;
+
+        total_width = message1.length() + 4;
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_width) / 2)  + "H");
+
+        terminal.writer().print("\u2554");
+        for (int i=0; i<message1.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u2557");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_width) / 2)  + "H");
+        terminal.writer().print("\u2551");
+        terminal.writer().print(" " + message1 + " ");
+        terminal.writer().print("\u2551");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_width) / 2)  + "H");
+        terminal.writer().print("\u255A");
+        for (int i=0; i<message1.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u255D");
+        terminal.flush();
     }
     //basic border for the menu
     public void init_menu() throws IOException, InterruptedException {
@@ -81,10 +151,16 @@ public class MainMenu {
     public void onTabKeyPressed(){
         // Check if the current menu is "Login"
         if(currentButtonIndex == -1) currentButtonIndex++;
-        if (currentMenu.equals("Login_or_Register")) {
+        if (currentMenu.equals("Login_or_Register") || currentMenu.equals("User_Dashboard")) {
+            int menu_button_group = 0;
+            int amount_of_buttons = 2;
+            if (currentMenu.equals("User_Dashboard")){
+                menu_button_group = 2;
+                amount_of_buttons = 5;
+            }
             // Move to the next button
-            this.currentButtonIndex = (currentButtonIndex) % buttons.size();
-            ButtonInfo currentButton = buttons.get(currentButtonIndex);
+            this.currentButtonIndex = (currentButtonIndex) % amount_of_buttons;
+            ButtonInfo currentButton = buttons.get(currentButtonIndex + menu_button_group);
             this.currentheight = currentButton.getHeight();
 
             // Clear the previous button
@@ -108,8 +184,8 @@ public class MainMenu {
             terminal.writer().print("\u255D");
 
 
-            this.currentButtonIndex = (currentButtonIndex+1) % buttons.size();
-            currentButton = buttons.get(currentButtonIndex);
+            this.currentButtonIndex = (currentButtonIndex+1) % amount_of_buttons;
+            currentButton = buttons.get(currentButtonIndex + menu_button_group);
             this.currentheight = currentButton.getHeight();
 
             terminal.writer().print("\u001B[" + (currentheight++)+ ";" + currentButton.getWidth() + "H");
@@ -137,10 +213,14 @@ public class MainMenu {
 
     public void onEnterKeyPressed() throws IOException, InterruptedException {
         // Check if the current menu is "Login"
-        if (currentMenu.equals("Login_or_Register")) {
+        if (currentMenu.equals("Login_or_Register") || currentMenu.equals("User_Dashboard")) {
             // Perform action based on the selected button
             if (currentButtonIndex == -1) return;
-            ButtonInfo currentButton = buttons.get(currentButtonIndex);
+            int menu_button_group = 0;
+            if (currentMenu.equals("User_Dashboard")){
+                menu_button_group = 2;
+            }
+            ButtonInfo currentButton = buttons.get(currentButtonIndex + menu_button_group);
             String buttonName = currentButton.getName();
             if (buttonName.equals("Login")) {
                 // Handle login action
@@ -151,8 +231,25 @@ public class MainMenu {
                 display_register_screen();
             }
 
-            if(isLogin){
+            if(isLogin && (currentMenu.equals("Login") || currentMenu.equals("Register") || currentMenu.equals("Login_or_Register"))){
                 display_user_dashboard();
+            }
+
+            else if (buttonName.equals("Online-Board")) {
+                // Handle online board action
+                System.out.println("Online-Board button pressed");
+            } else if (buttonName.equals("Show Flight Info")) {
+                // Handle show flight info action
+                System.out.println("Show Flight Info button pressed");
+            } else if (buttonName.equals("Book Flight")) {
+                // Handle book flight action
+                System.out.println("Book Flight button pressed");
+            } else if (buttonName.equals("Cancel Flight")) {
+                // Handle cancel flight action
+                System.out.println("Cancel Flight button pressed");
+            } else if (buttonName.equals("My Flights")) {
+                // Handle my flights action
+                System.out.println("My Flights button pressed");
             }
         }
     }
@@ -160,6 +257,7 @@ public class MainMenu {
     public void display_login_and_register_screen() throws InterruptedException, IOException {
         init_menu();
 
+        currentButtonIndex = -1;
         currentMenu = "Login_or_Register";
         int total_str_len;
         terminal.writer().print("\u001B[H\u001B[1B\u001B[1C");
@@ -171,47 +269,13 @@ public class MainMenu {
         message2 = "Register";
         total_str_len = message1.length() + message2.length() + 8 + 3;
 
-        buttons.add(new ButtonInfo("Login",(width - total_str_len)/2, currentheight));
-        buttons.add(new ButtonInfo("Register",((width - total_str_len)/2 + 7 + message1.length()), currentheight));
-
-        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
-        terminal.writer().print("\u2554");
-        for (int i=0; i<message1.length() + 2;i++){
-            terminal.writer().print("\u2550");
+        if(!is_login_register_buttons_added){
+            is_login_register_buttons_added = true;
+            buttons.add(new ButtonInfo("Login",(width - total_str_len)/2, currentheight));
+            buttons.add(new ButtonInfo("Register",((width - total_str_len)/2 + 7 + message1.length()), currentheight));
         }
-        terminal.writer().print("\u2557" + "   ");
 
-        terminal.writer().print("\u2554");
-        for (int i=0; i<message2.length() + 2;i++){
-            terminal.writer().print("\u2550");
-        }
-        terminal.writer().print("\u2557");
-
-        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
-        terminal.writer().print("\u2551");
-        terminal.writer().print(" " + message1 + " ");
-        terminal.writer().print("\u2551" + "   ");
-
-        terminal.writer().print("\u2551");
-        terminal.writer().print(" " + message2 + " ");
-        terminal.writer().print("\u2551");
-
-        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
-
-        terminal.writer().print("\u255A");
-        for (int i=0; i<message1.length() + 2;i++){
-            terminal.writer().print("\u2550");
-        }
-        terminal.writer().print("\u255D" + "   ");
-
-        terminal.writer().print("\u255A");
-        for (int i=0; i<message2.length() + 2;i++){
-            terminal.writer().print("\u2550");
-        }
-        terminal.writer().print("\u255D");
-
-        terminal.writer().print("\u001b[" + height + ";" + width + "f");
-        terminal.flush();
+        OutputButtons(message1, message2, 3);
     }
 
     public void register_name() throws IOException, InterruptedException{
@@ -222,13 +286,14 @@ public class MainMenu {
             switch (key) {
                 case 27 -> {
                     exitProgram();
+                    break OUTER;
                 }
                 case 9 ->{
                     
                 }
                 case 13 -> {
                     if(char_buffer_c_index!=0){
-                        String str = new String(char_buffer);
+                        String str = new String(char_buffer, 0, char_buffer_c_index);
                         boolean registered = true;
                         for (Passanger k : passangers){
                             if (k.getName().equals(str)){
@@ -277,13 +342,14 @@ public class MainMenu {
             switch (key) {
                 case 27 -> {
                     exitProgram();
+                    break OUTER;
                 }
                 case 9 ->{
                     
                 }
                 case 13 -> {
                     if(char_buffer_c_index!=0){
-                        String str = new String(char_buffer);
+                        String str = new String(char_buffer, 0, char_buffer_c_index);
 
                         for (Passanger k : passangers){
                             if (k.getName().equals(str)){
@@ -294,7 +360,7 @@ public class MainMenu {
                         }
                         char_buffer_c_index=5;
                         terminal.writer().print("\u001B[" + (6) + ";" + (((width - 15) / 2) + 1) + "H");
-                        terminal.writer().print("ERROR        " + "\u001B[" + (6) + ";" + (((width - 15) / 2) + 6) + "H");
+                        terminal.writer().print(char_buffer_c_index + "\u001B[" + (6) + ";" + (((width - 15) / 2) + 6) + "H");
                         terminal.flush();
                         
                     }
@@ -317,7 +383,7 @@ public class MainMenu {
             }
         }
         if(isLogin){
-            terminal.writer().print("nigga");
+            display_user_dashboard();
         }
     }
 
@@ -405,8 +471,36 @@ public class MainMenu {
 
     public void display_user_dashboard() throws IOException, InterruptedException{
         init_menu();
-        
+        currentButtonIndex = -1;
+        currentMenu = "User_Dashboard";
+        int total_str_len;
+        currentheight ++;
+        String message1 = "Welcome " + currentUser;
+        String message2;
 
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
+        terminal.writer().print(message1);
+
+        message1 = "Online-Board";
+        message2 = "Show Flight Info";
+        total_str_len = message1.length() + message2.length() + 8 + 8;
+        buttons.add(new ButtonInfo("Online-Board",(width - total_str_len)/2, currentheight));
+        buttons.add(new ButtonInfo("Show Flight Info",((width - total_str_len)/2 + 12 + message1.length()), currentheight));
+        OutputButtons(message1, message2, 8);
+
+        currentheight+=2;
+        message1 = "Book Flight";
+        total_str_len = message1.length() + 4;
+        buttons.add(new ButtonInfo("Book Flight",(width - total_str_len)/2, currentheight));
+        OutputButtons(message1);
+
+        currentheight+=2;
+        message1 = "Cancel Flight";
+        message2 = "My Flights";
+        total_str_len = message1.length() + message2.length() + 8 + 8;
+        buttons.add(new ButtonInfo("Cancel Flight",(width - total_str_len)/2, currentheight));
+        buttons.add(new ButtonInfo("My Flights",((width - total_str_len)/2 + 12 + message1.length()), currentheight));
+        OutputButtons(message1, message2, 8);
     }
 
 }

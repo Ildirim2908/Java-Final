@@ -1,4 +1,4 @@
-package main.java.airlineapp.model;
+package airlineapp.model;
 import java.time.LocalDateTime;
 
 

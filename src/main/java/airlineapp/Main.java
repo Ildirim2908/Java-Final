@@ -2,10 +2,11 @@ package airlineapp;
 
 import java.io.IOException;
 
-import airlineapp.console.MainMenu;
-
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+
+import airlineapp.console.MainMenu;
+import airlineapp.model.Passanger;
 
 public class Main {
 
@@ -19,6 +20,8 @@ public class Main {
         
         MainMenu mainMenu = new MainMenu(terminal);
         mainMenu.display_login_and_register_screen();
+
+        mainMenu.passangers.add(new Passanger("nigga"));
 
         while (true) {
             int key = terminal.reader().read();
