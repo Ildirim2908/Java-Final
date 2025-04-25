@@ -1,24 +1,31 @@
 package model;
+import jdk.jfr.TransitionFrom;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 
 
 public class Flight {
+    private String From;
     private String flightID;
     private String destination;
     private LocalDateTime departuretime;
     private int totalSeats;
     private int bookedSeats;
-    public Flight(String flightID, String destination, LocalDateTime departuretime, int totalSeats, int bookedSeats){
+    public Flight(String flightID, String destination,String From, LocalDateTime departuretime, int totalSeats, int bookedSeats){
         this.flightID = flightID;
         this.destination = destination;
         this.departuretime = departuretime;
         this.totalSeats = totalSeats;
         this.bookedSeats = bookedSeats;
+        this.From = From;
 
     }
 
+    public String getFrom(){
+        return From;
+    }
     public String getFlightID(){
         return flightID;
     }
