@@ -40,18 +40,27 @@ public class MainMenu {
     boolean is_user_dashboard_buttons_added = false;
 
     public void exitProgram() throws InterruptedException, IOException{
-        if("Login_or_Register".equals(currentMenu)){
-            terminal.writer().print("\u001B[" + height + ";" + width + "H");
-            terminal.flush();
-            System.out.println("\nQuit detected.");
-            System.exit(0);
-        }
-        else if("Login".equals(currentMenu) || "Register".equals(currentMenu)){
-            display_login_and_register_screen();
-        }
-        else if("User_Dashboard".equals(currentMenu)){
-            display_login_and_register_screen();
-            isLogin = false;
+        if(null != currentMenu)switch (currentMenu) {
+            case "Login_or_Register":
+                terminal.writer().print("\u001B[" + height + ";" + width + "H");
+                terminal.flush();
+                System.out.println("\nQuit detected.");
+                System.exit(0);
+            case "Login":
+                display_login_and_register_screen();
+                break;
+            case "Register":
+                display_login_and_register_screen();
+                break;
+            case "User_Dashboard":
+                display_login_and_register_screen();
+                isLogin = false;
+                break;
+            case "Online-Board":
+                display_user_dashboard();
+                break;
+            default:
+                break;
         }
     }
     

@@ -81,7 +81,7 @@ public class FlightDAO {
     }
 
     // ... (rest of your code, e.g., generateSampleFlights())
-    public void generateSampleFlights() {
+    private void generateSampleFlights() {
         String[] destinations = {"London", "Berlin", "Rome", "Paris", "Istanbul"};
         Random rand = new Random();
         String[] froms = {"Baku", "Kiev", "Moscow", "Tallin", "Florence"};

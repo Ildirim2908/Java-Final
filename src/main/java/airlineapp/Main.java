@@ -33,10 +33,6 @@ public class Main {
         mainMenu.passangers.add(new Passanger("ildirim"));
         mainMenu.passangers.add(new Passanger("fuad"));
         FlightDAO flightDAO = new FlightDAO();
-        flightDAO.generateSampleFlights();
-        flightDAO.generateSampleFlights();
-        flightDAO.generateSampleFlights();
-        flightDAO.generateSampleFlights();
 
 
         while (true) {
