@@ -90,7 +90,9 @@ public class FlightDAO {
             String flightID = "F" + i;
             String destination = destinations[rand.nextInt(destinations.length)];
             String from = froms[rand.nextInt(froms.length)];
-            LocalDateTime departure = LocalDateTime.now().plusHours(rand.nextInt(48));
+            LocalDateTime departure = LocalDateTime.now()
+                    .plusHours(rand.nextInt(48))
+                    .plusMinutes(rand.nextInt(60));
             int totalSeats = 100 + rand.nextInt(50);
             int bookedSeats = rand.nextInt(totalSeats / 2);
 
