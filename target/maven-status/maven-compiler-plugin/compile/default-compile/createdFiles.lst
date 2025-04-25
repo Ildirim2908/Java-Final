@@ -1,6 +1,7 @@
 airlineapp/Main.class
+airlineapp/console/ButtonInfo.class
+airlineapp/model/Passenger.class
+airlineapp/model/Flight.class
 airlineapp/DAO/FlightDAO.class
 airlineapp/console/MainMenu.class
-airlineapp/model/Passanger.class
-airlineapp/console/ButtonInfo.class
-airlineapp/model/Flight.class
+airlineapp/model/Booking.class

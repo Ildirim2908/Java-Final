@@ -3,4 +3,5 @@
 /home/eyes/Documents/Java-Final/src/main/java/airlineapp/DAO/FlightDAO.java
 /home/eyes/Documents/Java-Final/src/main/java/airlineapp/Main.java
 /home/eyes/Documents/Java-Final/src/main/java/airlineapp/model/Flight.java
-/home/eyes/Documents/Java-Final/src/main/java/airlineapp/model/Passanger.java
+/home/eyes/Documents/Java-Final/src/main/java/airlineapp/model/Passenger.java
+/home/eyes/Documents/Java-Final/src/main/java/airlineapp/model/Booking.java

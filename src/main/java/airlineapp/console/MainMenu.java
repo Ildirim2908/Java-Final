@@ -8,7 +8,7 @@ import org.jline.terminal.Terminal;
 
 import airlineapp.DAO.FlightDAO;
 import airlineapp.model.Flight;
-import airlineapp.model.Passanger;
+import airlineapp.model.Passenger;
 
 public class MainMenu {
     
@@ -18,7 +18,7 @@ public class MainMenu {
     String currentUser = new String();
 
     List<ButtonInfo> buttons = new ArrayList<>();
-    public List<Passanger> passangers = new ArrayList<>();
+    public List<Passenger> passengers = new ArrayList<>();
 
     FlightDAO flightDAO = new FlightDAO();
     public List<Flight> flights = flightDAO.getAllFlights();
@@ -331,7 +331,7 @@ public class MainMenu {
                     if(char_buffer_c_index!=0){
                         String str = new String(char_buffer, 0, char_buffer_c_index);
                         boolean registered = true;
-                        for (Passanger k : passangers){
+                        for (Passenger k : passengers){
                             if (k.getName().equals(str)){
                                 char_buffer_c_index=5;
                                 terminal.writer().print("\u001B[" + (6) + ";" + (((width - 15) / 2) + 1) + "H");
@@ -341,7 +341,7 @@ public class MainMenu {
                             }
                         }
                         if(registered){
-                            passangers.add(new Passanger(str));
+                            passengers.add(new Passenger(str));
                             currentUser = str;
                             isLogin=true;
                             break OUTER;
@@ -387,7 +387,7 @@ public class MainMenu {
                     if(char_buffer_c_index!=0){
                         String str = new String(char_buffer, 0, char_buffer_c_index);
 
-                        for (Passanger k : passangers){
+                        for (Passenger k : passengers){
                             if (k.getName().equals(str)){
                                 isLogin=true;
                                 currentUser = str;

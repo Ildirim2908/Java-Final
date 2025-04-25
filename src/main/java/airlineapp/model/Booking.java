@@ -3,21 +3,18 @@ package airlineapp.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 public class Booking implements Serializable
 {
     private String id;
-    private Flight flight;
-    private List<Passenger> passengers;
-    private LocalDateTime bookingTime;
+    private List<Flight> flights;
+    private Passenger passenger;
+    private List<LocalDateTime> bookingTimes;
 
-    public Booking(Flight flight, List<Passenger> passengers)
+    public Booking(Passenger passenger, List<Flight> flights)
     {
-        this.id=UUID.randomUUID().toString();
-        this.flight = flight;
-        this.passengers = passengers;
-        this.bookingTime = LocalDateTime.now();
+        this.flights = flights;
+        this.passenger = passenger;
     }
 
     public String getId()
@@ -25,19 +22,19 @@ public class Booking implements Serializable
         return id;
     }
 
-    public Flight getFlight()
+    public List<Flight> getFlights()
     {
-        return flight;
+        return flights;
     }
 
-    public List<Passenger> getPassengers()
+    public Passenger getPassenger()
     {
-        return passengers;
+        return passenger;
     }
 
-    public LocalDateTime getBookingTime()
+    public List<LocalDateTime> getBookingTimes()
     {
-        return bookingTime;
+        return bookingTimes;
     }
 
     @Override
@@ -45,9 +42,9 @@ public class Booking implements Serializable
     {
         return "Booking{" +
                 "id='" + id + '\'' +
-                ", flight=" + flight +
-                ", passengers=" + passengers +
-                ", bookingTime=" + bookingTime +
+                ", flight=" + flights +
+                ", passengers=" + passenger +
+                ", bookingTime=" + bookingTimes +
                 '}';
     }
 }
