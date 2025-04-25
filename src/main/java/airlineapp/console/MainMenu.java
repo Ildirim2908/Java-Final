@@ -59,6 +59,9 @@ public class MainMenu {
             case "Online-Board":
                 display_user_dashboard();
                 break;
+            case "Show Flight Info":
+                display_user_dashboard();
+                break;
             default:
                 break;
         }
@@ -141,7 +144,7 @@ public class MainMenu {
         terminal.flush();
     }
     //basic border for the menu
-    public void init_menu() throws IOException, InterruptedException {
+    public void init_menu(String esc, String tab, String enter) throws IOException, InterruptedException {
         currentheight = 2;
         terminal.writer().print("\u001B[2J\u001B[H\u001B[?25l\u001B[0;37;40m\u2554"); // Clear the screen
 
@@ -166,6 +169,20 @@ public class MainMenu {
         String message1 = "Welcome to the Airline Reservation System";
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
         terminal.writer().print(message1);
+
+        terminal.writer().print("\u001B[" + (height-3) + ";" + 3 + "H");
+        if(esc!= ""){
+            terminal.writer().print(esc);
+        }
+        if(enter!= ""){
+            terminal.writer().print("\u001B[" + (height-4) + ";" + 3 + "H");
+            terminal.writer().print(enter);
+        }
+        if(tab!= ""){
+            terminal.writer().print("\u001B[" + (height-5) + ";" + 3 + "H");
+            terminal.writer().print(tab);
+        }
+
         terminal.flush();
     }
 
@@ -259,8 +276,7 @@ public class MainMenu {
             else if (buttonName.equals("Online-Board")) {
                 display_online_board();
             } else if (buttonName.equals("Show Flight Info")) {
-                // Handle show flight info action
-                System.out.println("Show Flight Info button pressed");
+                show_flight_info();
             } else if (buttonName.equals("Book Flight")) {
                 // Handle book flight action
                 System.out.println("Book Flight button pressed");
@@ -275,7 +291,7 @@ public class MainMenu {
     }
     //Show Login Screen buttons and save their positions in buttons list
     public void display_login_and_register_screen() throws InterruptedException, IOException {
-        init_menu();
+        init_menu("Press \"Esc\" to quit.", "Press \"Tab\" to select between buttons.", "Press \"Enter\" to continue.");
 
         currentButtonIndex = -1;
         currentMenu = "Login_or_Register";
@@ -407,8 +423,62 @@ public class MainMenu {
         }
     }
 
+    public void enter_flight_id() throws IOException, InterruptedException{
+        char_buffer_c_index=0;
+        OUTER:
+        while (true) {
+            int key = terminal.reader().read();
+            switch (key) {
+                case 27 -> {
+                    exitProgram();
+                    break OUTER;
+                }
+                case 9 ->{
+                    
+                }
+                case 13 -> {
+                    if(char_buffer_c_index!=0){
+                        String str = new String(char_buffer, 0, char_buffer_c_index);
+                        Flight flight = flightDAO.getFlightById(str);
+                        if (flight != null) {
+                            String DepartureTime = flight.getDeparturetime().toString();
+                            DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
+                            currentheight++;
+                            OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats());
+                            terminal.writer().print("\u001B[" + (11) + ";" + ((((width - 15) / 2) + 1) + char_buffer_c_index) + "H");
+                            currentheight-=2;
+                            terminal.flush();
+                        }
+                        else{
+                            char_buffer_c_index=5;
+                            terminal.writer().print("\u001B[" + (11) + ";" + (((width - 15) / 2) + 1) + "H");
+                            terminal.writer().print("ERROR       " + "\u001B[" + (11) + ";" + (((width - 15) / 2) + 6) + "H");
+                            terminal.flush();
+                        }
+                    }
+
+                }
+                case 127 -> {
+                    if(char_buffer_c_index>0){
+                        char_buffer[char_buffer_c_index--] = ' ';
+                        terminal.writer().print("\u001B[1D \u001B[1D");
+                        terminal.flush();
+                    }
+                }
+                default -> {
+                    if(char_buffer_c_index<13){
+                        char_buffer[char_buffer_c_index++] = (char) key;
+                        terminal.writer().print((char) key);
+                        terminal.flush();
+                    }
+
+                }
+            }
+        }
+    }
+
     public void display_register_screen() throws InterruptedException, IOException {
-        init_menu();
+        init_menu("Press \"Esc\" to go back.", "", "Press \"Enter\" to continue.");
         currentMenu = "Register";
         
         currentheight++;
@@ -449,7 +519,7 @@ public class MainMenu {
     }
 
     public void display_login_screen() throws InterruptedException, IOException {
-        init_menu();
+        init_menu("Press \"Esc\" to go back.", "", "Press \"Enter\" to continue.");
         currentMenu = "Login";
         
         currentheight++;
@@ -490,7 +560,7 @@ public class MainMenu {
     }
 
     public void display_user_dashboard() throws IOException, InterruptedException{
-        init_menu();
+        init_menu("Press \"Esc\" to go back.", "Press \"Tab\" to select between buttons.", "Press \"Enter\" to continue.");
         currentButtonIndex = -1;
         currentMenu = "User_Dashboard";
         int total_str_len;
@@ -531,7 +601,7 @@ public class MainMenu {
     }
 
     public void display_online_board() throws IOException, InterruptedException{
-        init_menu();
+        init_menu("Press \"Esc\" to go back.", "", "");
         currentMenu = "Online-Board";
         currentheight++;
         String message1 = "Online Board";
@@ -544,9 +614,46 @@ public class MainMenu {
         terminal.flush();
         for (Flight k : flights){
             String DepartureTime = k.getDeparturetime().toString();
-            DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('.'));
+            DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
             OutputFlight(k.getFlightID(), k.getFrom(), k.getDestination(), DepartureTime, k.getAvailableSeats());
         }
         terminal.flush();
+    }
+
+    public void show_flight_info() throws IOException, InterruptedException{
+        init_menu("Press \"Esc\" to go back.", "Press \"Tab\" to select between buttons.", "Press \"Enter\" to continue.");
+        currentMenu = "Show Flight Info";
+        String message1 = "Flight Info";
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        OutputButtons(message1);
+        currentheight+=2;
+
+        message1 = "Enter Flight ID";
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print(message1);
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print("\u2554");
+        for (int i=0; i<message1.length()-2; i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u2557");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print("\u2551");
+        for (int i=0; i<message1.length()-2; i++){
+            terminal.writer().print(" ");
+        }
+        terminal.writer().print("\u2551");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print("\u255A");
+        for (int i=0; i<message1.length()-2; i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u255D");
+
+        terminal.writer().print("\u001B[" + (11) + ";" + (((width - message1.length()) / 2) + 1) + "H");
+
+        terminal.flush();
+
+        enter_flight_id();
     }
 }
