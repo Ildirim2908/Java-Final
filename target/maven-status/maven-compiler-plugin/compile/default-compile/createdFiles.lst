@@ -5,3 +5,5 @@ airlineapp/model/Flight.class
 airlineapp/DAO/FlightDAO.class
 airlineapp/console/MainMenu.class
 airlineapp/model/Booking.class
+airlineapp/DAO/PassengerDAO.class
+airlineapp/DAO/BookingDAO.class

@@ -80,6 +80,19 @@ public class FlightDAO {
         }
     }
 
+    public List<Flight> searchFlights(String destination, String from, LocalDateTime departure, int SeatsNeed) {
+        List<Flight> result = new ArrayList<>();
+        for (Flight flight : flights) {
+            if ((destination == null || flight.getDestination().equalsIgnoreCase(destination)) &&
+                (from == null || flight.getFrom().equalsIgnoreCase(from)) &&
+                (departure == null || flight.getDeparturetime().isAfter(departure)) &&
+                (SeatsNeed == -1 || flight.getAvailableSeats() >= SeatsNeed)) {
+                result.add(flight);
+            }
+        }
+        return result;
+    }
+
     // ... (rest of your code, e.g., generateSampleFlights())
     private void generateSampleFlights() {
         String[] destinations = {"London", "Berlin", "Rome", "Paris", "Istanbul"};

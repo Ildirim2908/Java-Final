@@ -1,9 +1,11 @@
 package airlineapp.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Passenger {
+public class Passenger implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String name;
     private final List<Integer> bookingIds;
 
@@ -26,5 +28,5 @@ public class Passenger {
 
     public int getBookingCount() {
         return bookingIds.size();
-    }
+    }
 }

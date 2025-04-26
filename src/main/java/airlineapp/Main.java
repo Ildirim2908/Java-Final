@@ -8,8 +8,8 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import airlineapp.DAO.FlightDAO;
+import airlineapp.DAO.PassengerDAO;
 import airlineapp.console.MainMenu;
-import airlineapp.model.Passenger;
 
 public class Main {
 
@@ -28,10 +28,8 @@ public class Main {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         String formattedDateTime = dateTime.format(formatter); 
 
-        mainMenu.passengers.add(new Passenger("kenan"));
-        mainMenu.passengers.add(new Passenger("nezrin"));
-        mainMenu.passengers.add(new Passenger("ildirim"));
-        mainMenu.passengers.add(new Passenger("fuad"));
+        PassengerDAO passengerDAO = new PassengerDAO();
+        
         FlightDAO flightDAO = new FlightDAO();
 
 

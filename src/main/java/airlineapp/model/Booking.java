@@ -2,49 +2,46 @@ package airlineapp.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
 
-public class Booking implements Serializable
-{
-    private String id;
-    private List<Flight> flights;
-    private Passenger passenger;
-    private List<LocalDateTime> bookingTimes;
+public class Booking implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private final String id;
+    private final Flight flight;
+    private final Passenger passenger;
+    private final LocalDateTime bookingTime;
 
-    public Booking(Passenger passenger, List<Flight> flights)
-    {
-        this.flights = flights;
+    public Booking(Passenger passenger, Flight flight) {
+        this.id = UUID.randomUUID().toString();
         this.passenger = passenger;
+        this.flight = flight;
+        this.bookingTime = LocalDateTime.now();
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public List<Flight> getFlights()
-    {
-        return flights;
+    public Flight getFlight() {
+        return flight;
     }
 
-    public Passenger getPassenger()
-    {
+    public Passenger getPassenger() {
         return passenger;
     }
 
-    public List<LocalDateTime> getBookingTimes()
-    {
-        return bookingTimes;
+    public LocalDateTime getBookingTime() {
+        return bookingTime;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Booking{" +
                 "id='" + id + '\'' +
-                ", flight=" + flights +
-                ", passengers=" + passenger +
-                ", bookingTime=" + bookingTimes +
+                ", flight=" + flight.getFlightID() +
+                ", passenger=" + passenger.getName() +
+                ", bookingTime=" + bookingTime +
                 '}';
     }
 }

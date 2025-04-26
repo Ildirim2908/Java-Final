@@ -1,15 +1,18 @@
 package airlineapp.console;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jline.terminal.Terminal;
 
+import airlineapp.DAO.BookingDAO;
 import airlineapp.DAO.FlightDAO;
+import airlineapp.DAO.PassengerDAO;
+import airlineapp.model.Booking;
 import airlineapp.model.Flight;
 import airlineapp.model.Passenger;
-
 public class MainMenu {
     
     char[] char_buffer = new char[100];
@@ -18,10 +21,15 @@ public class MainMenu {
     String currentUser = new String();
 
     List<ButtonInfo> buttons = new ArrayList<>();
-    public List<Passenger> passengers = new ArrayList<>();
+    
+    PassengerDAO passengerDAO = new PassengerDAO();
+    public List<Passenger> passengers = passengerDAO.getAllPassengers();
 
     FlightDAO flightDAO = new FlightDAO();
     public List<Flight> flights = flightDAO.getAllFlights();
+
+    BookingDAO bookingDAO = new BookingDAO();
+    public List<Booking> bookings = bookingDAO.getAllBookings();
 
     int currentButtonIndex = -1;
 
@@ -41,11 +49,12 @@ public class MainMenu {
 
     public void exitProgram() throws InterruptedException, IOException{
         if(null != currentMenu)switch (currentMenu) {
-            case "Login_or_Register":
+            case "Login_or_Register": {
                 terminal.writer().print("\u001B[" + height + ";" + width + "H");
                 terminal.flush();
                 System.out.println("\nQuit detected.");
                 System.exit(0);
+            }
             case "Login":
                 display_login_and_register_screen();
                 break;
@@ -62,6 +71,12 @@ public class MainMenu {
             case "Show Flight Info":
                 display_user_dashboard();
                 break;
+            case "Book Flight":
+                display_user_dashboard();
+                break;
+            case "Cancel Flight":
+                display_user_dashboard();
+                break;
             default:
                 break;
         }
@@ -71,7 +86,7 @@ public class MainMenu {
         this.terminal = terminal;
         this.width = terminal.getWidth();
         this.height = terminal.getHeight();
-        height = (height > 60) ? 60 : height;
+        height = (height > 80) ? 80 : height;
     }
 
     public void OutputButtons (String message1, String message2, int space_between_buttons) throws IOException {
@@ -278,11 +293,9 @@ public class MainMenu {
             } else if (buttonName.equals("Show Flight Info")) {
                 show_flight_info();
             } else if (buttonName.equals("Book Flight")) {
-                // Handle book flight action
-                System.out.println("Book Flight button pressed");
+                show_book_a_flight();
             } else if (buttonName.equals("Cancel Flight")) {
-                // Handle cancel flight action
-                System.out.println("Cancel Flight button pressed");
+                show_cancel_booking();
             } else if (buttonName.equals("My Flights")) {
                 // Handle my flights action
                 System.out.println("My Flights button pressed");
@@ -330,18 +343,14 @@ public class MainMenu {
                 case 13 -> {
                     if(char_buffer_c_index!=0){
                         String str = new String(char_buffer, 0, char_buffer_c_index);
-                        boolean registered = true;
-                        for (Passenger k : passengers){
-                            if (k.getName().equals(str)){
-                                char_buffer_c_index=5;
-                                terminal.writer().print("\u001B[" + (6) + ";" + (((width - 15) / 2) + 1) + "H");
-                                terminal.writer().print("ERROR        " + "\u001B[" + (6) + ";" + (((width - 15) / 2) + 6) + "H");
-                                terminal.flush();
-                                registered = false;
-                            }
+                        if(passengerDAO.findPassenger(str)!= null){
+                            char_buffer_c_index=5;
+                            terminal.writer().print("\u001B[" + (6) + ";" + (((width - 15) / 2) + 1) + "H");
+                            terminal.writer().print("ERROR       " + "\u001B[" + (6) + ";" + (((width - 15) / 2) + 6) + "H");
+                            terminal.flush();
                         }
-                        if(registered){
-                            passengers.add(new Passenger(str));
+                        else{
+                            passengerDAO.addPassenger(new Passenger(str));
                             currentUser = str;
                             isLogin=true;
                             break OUTER;
@@ -387,17 +396,17 @@ public class MainMenu {
                     if(char_buffer_c_index!=0){
                         String str = new String(char_buffer, 0, char_buffer_c_index);
 
-                        for (Passenger k : passengers){
-                            if (k.getName().equals(str)){
-                                isLogin=true;
-                                currentUser = str;
-                                break OUTER;
-                            }
+                        if(passengerDAO.findPassenger(str)!= null){
+                            currentUser = str;
+                            isLogin=true;
+                            break OUTER;
                         }
+                        else{
                         char_buffer_c_index=5;
                         terminal.writer().print("\u001B[" + (6) + ";" + (((width - 15) / 2) + 1) + "H");
                         terminal.writer().print("ERROR       " + "\u001B[" + (6) + ";" + (((width - 15) / 2) + 6) + "H");
                         terminal.flush();
+                        }
                         
                     }
                 }
@@ -467,6 +476,189 @@ public class MainMenu {
                 }
                 default -> {
                     if(char_buffer_c_index<13){
+                        char_buffer[char_buffer_c_index++] = (char) key;
+                        terminal.writer().print((char) key);
+                        terminal.flush();
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void book_flight_by_id() throws IOException, InterruptedException{
+        char_buffer_c_index=0;
+        OUTER:
+        while (true) {
+            int key = terminal.reader().read();
+            switch (key) {
+                case 27 -> {
+                    // clean button
+                    for (int i=-1; i<3;i++){
+                        terminal.writer().print("\u001B[" + (currentheight + i - 3) + ";" + ((width - 30) / 2)  + "H");
+                        for (int j = 0; j < 30; j++) {
+                            terminal.writer().print(" ");
+                        }
+                    }
+                    terminal.writer().print("\u001B[" + (9) + ";" + ((width - 56) / 2)  + "H");
+                    String emptystr = " ".repeat(65);
+                    terminal.writer().print(emptystr + "\u001B[" + (9) + ";" + (((width - 56) / 2)) + "H");
+                    terminal.flush();
+
+                    currentheight = 11;
+                    break OUTER;
+                }
+                case 9 ->{
+                    
+                }
+                case 13 -> {
+                    if(char_buffer_c_index!=0){
+                        String str = new String(char_buffer, 0, char_buffer_c_index);
+                        Flight flight = flightDAO.getFlightById(str);
+                        if (flight != null) {
+                            char_buffer_c_index=8;
+                            bookingDAO.createBooking(passengerDAO.findPassenger(currentUser), flight);
+                            terminal.writer().print("\u001B[" + (currentheight - 2) + ";" + (((width - 12) / 2)) + "H");
+                            terminal.writer().print("Success.");
+                            terminal.writer().print("\u001B[" + (currentheight - 2) + ";" + (((width - 12) / 2) + 8) + "H");
+                            terminal.flush();
+                        }
+                        else{
+                            char_buffer_c_index=5;
+                            terminal.writer().print("\u001B[" + (currentheight-2) + ";" + (((width - 14) / 2) + 1) + "H");
+                            terminal.writer().print("ERROR        " + "\u001B[" + (currentheight-2) + ";" + (((width - 14) / 2) + 6) + "H");
+                            terminal.flush();
+                        }
+                    }
+
+                }
+                case 127 -> {
+                    if(char_buffer_c_index>0){
+                        char_buffer[char_buffer_c_index--] = ' ';
+                        terminal.writer().print("\u001B[1D \u001B[1D");
+                        terminal.flush();
+                    }
+                }
+                default -> {
+                    if(char_buffer_c_index<13){
+                        char_buffer[char_buffer_c_index++] = (char) key;
+                        terminal.writer().print((char) key);
+                        terminal.flush();
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void book_flight_button() throws IOException, InterruptedException{
+        currentheight++;
+        String message1 = "Book Flight";
+        int total_str_len = message1.length() + 4;
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len + 4) / 2)  + "H");
+        terminal.writer().print(message1);
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
+        terminal.writer().print("\u2554");
+        for (int i=0; i<message1.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u2557");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
+        terminal.writer().print("\u2551");
+        terminal.writer().print(String.valueOf(' ').repeat(total_str_len - 2));
+        terminal.writer().print("\u2551");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + ((width - total_str_len) / 2)  + "H");
+        terminal.writer().print("\u255A");
+        for (int i=0; i<message1.length() + 2;i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u255D");
+        terminal.writer().print("\u001B[" + (currentheight - 2) + ";" + ((width - 12) / 2)  + "H");
+
+        terminal.flush();
+        book_flight_by_id();
+    }
+
+    public void search_for_a_flight() throws InterruptedException, IOException {
+        char_buffer_c_index=0;
+        OUTER:
+        while (true) {
+            int key = terminal.reader().read();
+            switch (key) {
+                case 27 -> {
+                    exitProgram();
+                    break OUTER;
+                }
+                case 9 ->{
+                    
+                }
+                case 13 -> {
+                    if(char_buffer_c_index!=0){
+
+                        String str = new String(char_buffer, 0, char_buffer_c_index);
+                        
+                        if (str.split(";", -1).length - 1 != 3) {
+                            char_buffer_c_index=5;
+                            String emptystr = " ".repeat(60);
+                            terminal.writer().print("\u001B[" + (9) + ";" + (((width - 58) / 2) + 1) + "H");
+                            terminal.writer().print("ERROR" + emptystr + "\u001B[" + (9) + ";" + (((width - 58) / 2) + 6) + "H");
+                            terminal.flush();
+                            continue;
+                        }
+
+                        String[] parts = str.split(";", -1);
+                        String from = parts[0].trim().isEmpty() ? null : parts[0].trim();
+                        String to = parts[1].trim().isEmpty() ? null : parts[1].trim();
+                        String departureTimeStr = parts[2].trim().isEmpty() ? null : parts[2].trim();
+                        String seatsNeededStr = parts[3].trim().isEmpty() ? null : parts[3].trim();
+
+                        int seatsNeeded = (seatsNeededStr != null) ? Integer.parseInt(seatsNeededStr) : -1;
+                        
+                        LocalDateTime departureTime = null;
+
+                        if (departureTimeStr != null) {
+                            departureTimeStr = departureTimeStr.replace(" ", "T");
+                            departureTime = LocalDateTime.parse(departureTimeStr);
+                        }
+                        List<Flight> searchResults = flightDAO.searchFlights(to, from, departureTime, seatsNeeded);
+                        if (searchResults.isEmpty()) {
+                            String emptystr = " ".repeat(48);
+                            char_buffer_c_index = 17;
+                            terminal.writer().print("\u001B[" + (9) + ";" + (((width - 58) / 2) + 1) + "H");
+                            terminal.writer().print("No flights found." + emptystr + "\u001B[" + (9) + ";" + (((width - 58) / 2) + 18) + "H");
+                            terminal.flush();
+                        } 
+                        else {
+                            terminal.writer().print("\u001B[" + (12) + ";" + (((width - 58) / 2) + 1) + "H");
+                            for (Flight flight : searchResults) {
+                                String DepartureTime = flight.getDeparturetime().toString();
+                                DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
+                                currentheight++;
+                                OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats());
+                            }
+
+                            for (int i = currentheight; i < height - 4; i++) {
+                                terminal.writer().print("\u001B[" + (i) + ";" + 2 + "H");
+                                for (int j = 0; j < 80; j++) {
+                                    terminal.writer().print(" ");
+                                }
+                            }
+
+                            currentheight++;
+                            book_flight_button();
+                        }
+                    }
+
+                }
+                case 127 -> {
+                    if(char_buffer_c_index>0){
+                        char_buffer[char_buffer_c_index--] = ' ';
+                        terminal.writer().print("\u001B[1D \u001B[1D");
+                        terminal.flush();
+                    }
+                }
+                default -> {
+                    if(char_buffer_c_index<65){
                         char_buffer[char_buffer_c_index++] = (char) key;
                         terminal.writer().print((char) key);
                         terminal.flush();
@@ -655,5 +847,68 @@ public class MainMenu {
         terminal.flush();
 
         enter_flight_id();
+    }
+
+    public void show_book_a_flight() throws IOException, InterruptedException{
+        init_menu("Press \"Esc\" to go back.", "", "Press \"Enter\" to continue.");
+        currentMenu = "Book Flight";
+        String message1 = "Book a Flight";
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        OutputButtons(message1);
+        String message2 = "Format to search for a flight: From; To; DepartureTime; SeatsNeeded";
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message2.length() + 8) / 2 + "H");
+        terminal.writer().print(message2);
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - 58) / 2 + "H");
+        terminal.writer().print("\u2554");
+        for (int i=0; i<message2.length()-2; i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u2557");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - 58) / 2 + "H");
+        terminal.writer().print("\u2551");
+        for (int i=0; i<message2.length()-2; i++){
+            terminal.writer().print(" ");
+        }
+        terminal.writer().print("\u2551");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - 58) / 2 + "H");
+        terminal.writer().print("\u255A");
+        for (int i=0; i<message2.length()-2; i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u255D");
+        terminal.writer().print("\u001B[" + (9) + ";" + (((width - 58) / 2) + 1) + "H");
+        terminal.flush();
+        char_buffer_c_index=0;
+
+        search_for_a_flight();
+    }
+
+    public void show_cancel_booking() throws IOException, InterruptedException{
+        init_menu("Press \"Esc\" to go back.", "", "Press \"Enter\" to continue.");
+        currentMenu = "Cancel Flight";
+        String message1 = "Cancel a Flight";
+        currentheight++;
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print(message1);
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print("\u2554");
+        for (int i=0; i<message1.length()-2; i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u2557");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print("\u2551");
+        for (int i=0; i<message1.length()-2; i++){
+            terminal.writer().print(" ");
+        }
+        terminal.writer().print("\u2551");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
+        terminal.writer().print("\u255A");
+        for (int i=0; i<message1.length()-2; i++){
+            terminal.writer().print("\u2550");
+        }
+        terminal.writer().print("\u255D");
+        terminal.writer().print("\u001B[" + (6) + ";" + (((width - message1.length()) / 2) + 1) + "H");
+        terminal.flush();
     }
 }
