@@ -51,6 +51,11 @@ public class BookingDAO {
                 .toList();
     }
 
+    public void deleteBooking(Booking booking) {
+        bookings.remove(booking);
+        saveBookings();
+    }
+
     private void saveBookings() {
         File tmpFile = new File(FILE_PATH + ".tmp");
         File datFile = new File(FILE_PATH);

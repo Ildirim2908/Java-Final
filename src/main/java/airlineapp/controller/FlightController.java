@@ -1,9 +1,10 @@
 package airlineapp.controller;
 
-import airlineapp.model.Flight;
-import airlineapp.service.FlightService;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import airlineapp.model.Flight;
+import airlineapp.service.FlightService;
 
 public class FlightController {
     private final FlightService flightService;
