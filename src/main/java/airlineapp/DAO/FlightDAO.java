@@ -38,6 +38,11 @@ public class FlightDAO {
                 .orElse(null);
     }
 
+    public void increaseBookedSeats(Flight flight){
+        flight.increaseBookedSeats();
+        saveFlightsToFile();
+    }
+
     public void loadFlightsFromFile() {
         File file = new File(filePath);
         if (file.length() == 0) {

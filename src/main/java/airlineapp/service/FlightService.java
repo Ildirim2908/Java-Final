@@ -1,9 +1,10 @@
 package airlineapp.service;
 
-import airlineapp.DAO.FlightDAO;
-import airlineapp.model.Flight;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import airlineapp.DAO.FlightDAO;
+import airlineapp.model.Flight;
 
 public class FlightService {
     private final FlightDAO flightDAO;
@@ -22,5 +23,9 @@ public class FlightService {
 
     public List<Flight> searchFlights(String destination, String from, LocalDateTime departure, int seatsNeed) {
         return flightDAO.searchFlights(destination, from, departure, seatsNeed);
+    }
+
+    public void increaseBookedSeats(Flight flight) {
+        flightDAO.increaseBookedSeats(flight);
     }
 }

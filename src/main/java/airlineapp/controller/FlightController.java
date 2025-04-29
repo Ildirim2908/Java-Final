@@ -24,4 +24,8 @@ public class FlightController {
     public List<Flight> searchFlights(String destination, String from, LocalDateTime departure, int seatsNeed) {
         return flightService.searchFlights(destination, from, departure, seatsNeed);
     }
+
+    public void increaseBookedSeats(Flight flight) {
+        flightService.increaseBookedSeats(flight);
+    }
 }

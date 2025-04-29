@@ -1,7 +1,6 @@
 package airlineapp.model;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 public class Flight implements Serializable {
@@ -38,6 +37,14 @@ public class Flight implements Serializable {
     }
     public int getAvailableSeats(){
         return totalSeats - bookedSeats;
+    }
+
+    public void increaseBookedSeats(){
+        if (bookedSeats < totalSeats) {
+            bookedSeats++;
+        } else {
+            System.out.println("No available seats");
+        }
     }
 
 
