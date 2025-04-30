@@ -99,8 +99,6 @@ public class BookingDAO {
         }
         
         boolean removed = bookings.remove(booking);
-        System.out.println("[DEBUG] Booking " + booking.getId() + 
-                          " removed: " + removed);
         
         saveBookingsToFile();
     }
