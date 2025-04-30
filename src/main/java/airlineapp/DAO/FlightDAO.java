@@ -43,6 +43,11 @@ public class FlightDAO {
         saveFlightsToFile();
     }
 
+    public void decreaseBookedSeats(Flight flight){
+        flight.decreaseBookedSeats();
+        saveFlightsToFile();
+    }
+
     public void loadFlightsFromFile() {
         File file = new File(filePath);
         if (file.length() == 0) {

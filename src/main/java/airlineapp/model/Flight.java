@@ -47,6 +47,14 @@ public class Flight implements Serializable {
         }
     }
 
+    public void decreaseBookedSeats(){
+        if (bookedSeats > 0) {
+            bookedSeats--;
+        } else {
+            System.out.println("No booked seats to cancel");
+        }
+    }
+
 
     @Override
     public String toString() {

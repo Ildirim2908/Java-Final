@@ -28,4 +28,7 @@ public class FlightService {
     public void increaseBookedSeats(Flight flight) {
         flightDAO.increaseBookedSeats(flight);
     }
+    public void decreaseBookedSeats(Flight flight) {
+        flightDAO.decreaseBookedSeats(flight);
+    }
 }

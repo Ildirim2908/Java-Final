@@ -28,4 +28,8 @@ public class FlightController {
     public void increaseBookedSeats(Flight flight) {
         flightService.increaseBookedSeats(flight);
     }
+
+    public void decreaseBookedSeats(Flight flight) {
+        flightService.decreaseBookedSeats(flight);
+    }
 }

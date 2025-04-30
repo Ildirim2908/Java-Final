@@ -602,7 +602,17 @@ public class MainMenu {
 
                         if (departureTimeStr != null) {
                             departureTimeStr = departureTimeStr.replace(" ", "T");
-                            departureTime = LocalDateTime.parse(departureTimeStr);
+                            try{
+                                departureTime = LocalDateTime.parse(departureTimeStr);
+                            }
+                            catch (Exception e){
+                                char_buffer_c_index=5;
+                                String emptystr = " ".repeat(60);
+                                terminal.writer().print("\u001B[" + (9) + ";" + (((width - 58) / 2) + 1) + "H");
+                                terminal.writer().print("ERROR" + emptystr + "\u001B[" + (9) + ";" + (((width - 58) / 2) + 6) + "H");
+                                terminal.flush();
+                                continue;
+                            }
                         }
                         List<Flight> searchResults = flightController.searchFlights(to, from, departureTime, seatsNeeded);
                         if (searchResults.isEmpty()) {
@@ -670,7 +680,8 @@ public class MainMenu {
                     if(char_buffer_c_index!=0){
                         String str = new String(char_buffer, 0, char_buffer_c_index);
                         Booking booking = bookingController.findBooking(str);
-                        if (booking != null) {
+                        if (booking != null && booking.getPassenger().getName().equals(currentUser)) {
+                            flightController.decreaseBookedSeats(booking.getFlight());
                             bookingController.deleteBooking(booking);
                             terminal.writer().print("\u001B[" + (currentheight - 2) + ";" + (((width - 12) / 2)) + "H");
                             terminal.writer().print("Success.");
@@ -990,7 +1001,7 @@ public class MainMenu {
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
         OutputButtons(message1);
         currentheight++;
-        String line = String.format("%-6s %-5s %-15s %-15s %-20s %-3s","BID" ,"ID", "From", "To", "DepartureTime", "AvailableSeats");
+        String line = String.format("%-9s %-5s %-15s %-15s %-20s %-3s","BID" ,"ID", "From", "To", "DepartureTime", "AvailableSeats");
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
         terminal.writer().print(line);
         terminal.flush();
@@ -998,9 +1009,9 @@ public class MainMenu {
             Flight flight = flightController.getFlightById(k.getFlight().getFlightID());
             String DepartureTime = flight.getDeparturetime().toString();
             DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
-            String line2 = String.format("\u001B[" + (currentheight) + ";" + 3 + "H" + "%-5s ", k.getId());
+            String line2 = String.format("\u001B[" + (currentheight) + ";" + 3 + "H" + "%-8s ", k.getId());
             terminal.writer().print(line2);
-            OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats(), 7);
+            OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats(), 10);
         }
         terminal.flush();
     }
