@@ -164,9 +164,9 @@ public class MainMenu {
         terminal.flush();
     }
     
-    public void OutputFlight (String id, String From, String To, String DepartureTime, int AvailableSeats) throws IOException {
+    public void OutputFlight (String id, String From, String To, String DepartureTime, int AvailableSeats, int currentwidth) throws IOException {
         String line = String.format("%-5s %-15s %-15s %-20s %-3s",id + ":", From, To, DepartureTime, AvailableSeats);
-        terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
+        terminal.writer().print("\u001B[" + (currentheight++) + ";" + (3 + currentwidth) + "H");
         terminal.writer().print(line);
         terminal.flush();
     }
@@ -464,7 +464,7 @@ public class MainMenu {
                             String DepartureTime = flight.getDeparturetime().toString();
                             DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
                             currentheight++;
-                            OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats());
+                            OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats(), 0);
                             terminal.writer().print("\u001B[" + (11) + ";" + ((((width - 15) / 2) + 1) + char_buffer_c_index) + "H");
                             currentheight-=2;
                             terminal.flush();
@@ -618,7 +618,7 @@ public class MainMenu {
                                 String DepartureTime = flight.getDeparturetime().toString();
                                 DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
                                 currentheight++;
-                                OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats());
+                                OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats(), 0);
                             }
 
                             for (int i = currentheight; i < height - 4; i++) {
@@ -872,7 +872,7 @@ public class MainMenu {
         for (Flight k : flights){
             String DepartureTime = k.getDeparturetime().toString();
             DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
-            OutputFlight(k.getFlightID(), k.getFrom(), k.getDestination(), DepartureTime, k.getAvailableSeats());
+            OutputFlight(k.getFlightID(), k.getFrom(), k.getDestination(), DepartureTime, k.getAvailableSeats(), 0);
         }
         terminal.flush();
     }
@@ -982,22 +982,25 @@ public class MainMenu {
     public void show_my_flights() throws IOException, InterruptedException{
 
         Passenger passenger = passengerController.findPassenger(currentUser);
-
         init_menu("Press \"Esc\" to go back.", "", "Press \"Enter\" to continue.");
+        List<Booking> passengerBookings = bookingController.getPassengerBookings(passenger);
+
         currentMenu = "My Flights";
         String message1 = "My Flights";
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + (width - message1.length()) / 2 + "H");
         OutputButtons(message1);
         currentheight++;
-        String line = String.format("%-5s %-15s %-15s %-20s %-3s","ID", "From", "To", "DepartureTime", "AvailableSeats");
+        String line = String.format("%-6s %-5s %-15s %-15s %-20s %-3s","BID" ,"ID", "From", "To", "DepartureTime", "AvailableSeats");
         terminal.writer().print("\u001B[" + (currentheight++) + ";" + 3 + "H");
         terminal.writer().print(line);
         terminal.flush();
-        for (Booking k : bookingController.getPassengerBookings(passenger)){
+        for (Booking k : passengerBookings){
             Flight flight = flightController.getFlightById(k.getFlight().getFlightID());
             String DepartureTime = flight.getDeparturetime().toString();
             DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
-            OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats());
+            String line2 = String.format("\u001B[" + (currentheight) + ";" + 3 + "H" + "%-5s ", k.getId());
+            terminal.writer().print(line2);
+            OutputFlight(flight.getFlightID(), flight.getFrom(), flight.getDestination(), DepartureTime, flight.getAvailableSeats(), 7);
         }
         terminal.flush();
     }

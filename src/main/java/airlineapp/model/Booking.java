@@ -13,7 +13,7 @@ public class Booking implements Serializable {
     private final LocalDateTime bookingTime;
 
     public Booking(Passenger passenger, Flight flight) {
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID().toString().substring(0, 5);
         this.passenger = passenger;
         this.flight = flight;
         this.bookingTime = LocalDateTime.now();

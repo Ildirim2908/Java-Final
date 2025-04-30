@@ -5,9 +5,9 @@ import java.util.List;
 import airlineapp.model.Passenger;
 import airlineapp.service.PassangerService;
 
-public class PassangerController {
+public class PassengerController {
     private final PassangerService passangerService;
-    public PassangerController(PassangerService passangerService) {
+    public PassengerController(PassangerService passangerService) {
         this.passangerService = passangerService;
     }
     public void addPassenger(Passenger passenger) {
