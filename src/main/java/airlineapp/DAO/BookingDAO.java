@@ -88,7 +88,7 @@ public class BookingDAO {
     public List<Booking> getFlightBookings(Flight flight) {
         if (bookings == null) return new ArrayList<>();
         return bookings.stream()
-                .filter(b -> b.getFlight() != null && b.getFlight().equals(flight))
+                .filter(b -> b.getFlightId() != null && b.getFlightId().equals(flight.getFlightID()))
                 .toList();
     }
 
@@ -132,7 +132,7 @@ public class BookingDAO {
                 for (Object item : rawList) {
                     if (item instanceof Booking) {
                         Booking b = (Booking) item;
-                        if (b.getFlight() == null) {
+                        if (b.getFlightId() == null) {
                             System.out.println("[WARN] Booking has null flight: " + b.getId());
                             continue;
                         }
@@ -210,7 +210,7 @@ public class BookingDAO {
                     System.err.println("[WARN] Skipping null booking");
                     continue;
                 }
-                if (b.getFlight() == null) {
+                if (b.getFlightId() == null) {
                     System.err.println("[WARN] Skipping booking with null flight: " + b.getId());
                     continue;
                 }

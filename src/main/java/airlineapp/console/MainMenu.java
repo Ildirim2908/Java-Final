@@ -681,7 +681,7 @@ public class MainMenu {
                         String str = new String(char_buffer, 0, char_buffer_c_index);
                         Booking booking = bookingController.findBooking(str);
                         if (booking != null && booking.getPassenger().getName().equals(currentUser)) {
-                            flightController.decreaseBookedSeats(booking.getFlight());
+                            flightController.decreaseBookedSeats(flightController.getFlightById(booking.getFlightId()));
                             bookingController.deleteBooking(booking);
                             terminal.writer().print("\u001B[" + (currentheight - 2) + ";" + (((width - 12) / 2)) + "H");
                             terminal.writer().print("Success.");
@@ -1006,7 +1006,7 @@ public class MainMenu {
         terminal.writer().print(line);
         terminal.flush();
         for (Booking k : passengerBookings){
-            Flight flight = flightController.getFlightById(k.getFlight().getFlightID());
+            Flight flight = flightController.getFlightById(k.getFlightId());
             String DepartureTime = flight.getDeparturetime().toString();
             DepartureTime = DepartureTime.substring(0, DepartureTime.indexOf('T')) + " " + DepartureTime.substring(DepartureTime.indexOf('T') + 1, DepartureTime.indexOf('.') - 3);
             String line2 = String.format("\u001B[" + (currentheight) + ";" + 3 + "H" + "%-8s ", k.getId());

@@ -8,14 +8,14 @@ public class Booking implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private final String id;
-    private final Flight flight;
+    private final String flightid;
     private final Passenger passenger;
     private final LocalDateTime bookingTime;
 
     public Booking(Passenger passenger, Flight flight) {
         this.id = UUID.randomUUID().toString().substring(0, 8);
         this.passenger = passenger;
-        this.flight = flight;
+        this.flightid = flight.getFlightID();
         this.bookingTime = LocalDateTime.now();
     }
 
@@ -23,8 +23,8 @@ public class Booking implements Serializable {
         return id;
     }
 
-    public Flight getFlight() {
-        return flight;
+    public String getFlightId() {
+        return flightid;
     }
 
     public Passenger getPassenger() {
@@ -39,7 +39,7 @@ public class Booking implements Serializable {
     public String toString() {
         return "Booking{" +
                 "id='" + id + '\'' +
-                ", flight=" + flight.getFlightID() +
+                ", flight=" + flightid +
                 ", passenger=" + passenger.getName() +
                 ", bookingTime=" + bookingTime +
                 '}';
