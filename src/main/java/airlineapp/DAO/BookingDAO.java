@@ -98,7 +98,7 @@ public class BookingDAO {
             return;
         }
         
-        boolean removed = bookings.remove(booking);
+        bookings.remove(booking);
         
         saveBookingsToFile();
     }
@@ -125,13 +125,11 @@ public class BookingDAO {
             System.out.println("[DEBUG] Object read successfully. Type: " + 
                              (obj != null ? obj.getClass().getName() : "null"));
             
-            if (obj instanceof List<?>) {
-                List<?> rawList = (List<?>) obj;
+            if (obj instanceof List<?> rawList) {
                 bookings = new ArrayList<>();
                 
                 for (Object item : rawList) {
-                    if (item instanceof Booking) {
-                        Booking b = (Booking) item;
+                    if (item instanceof Booking b) {
                         if (b.getFlightId() == null) {
                             System.out.println("[WARN] Booking has null flight: " + b.getId());
                             continue;
@@ -162,11 +160,9 @@ public class BookingDAO {
             handleCorruptedData();
         } catch (IOException e) {
             System.err.println("[ERROR] IO error loading bookings: " + e.getMessage());
-            e.printStackTrace();
             handleCorruptedData();
         } catch (Exception e) {
             System.err.println("[ERROR] Unexpected error: " + e.getMessage());
-            e.printStackTrace();
             handleCorruptedData();
         } finally {
             try {
@@ -238,7 +234,6 @@ public class BookingDAO {
             success = true;
         } catch (IOException e) {
             System.err.println("[ERROR] Save failed: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
                 if (oos != null) oos.close();
@@ -275,28 +270,26 @@ public class BookingDAO {
             Flight testFlight = new Flight("TEST123", "TestDest", "TestFrom", 
                                           LocalDateTime.now(), 100, 0);
             File testFile = new File("test_flight.tmp");
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(testFile));
-            oos.writeObject(testFlight);
-            oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(testFile))) {
+                oos.writeObject(testFlight);
+            }
             System.out.println("Flight serialization test PASSED");
             testFile.delete();
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Flight serialization test FAILED: " + e.getMessage());
-            e.printStackTrace();
         }
         
         System.out.println("\nTesting Passenger serialization...");
         try {
             Passenger testPassenger = new Passenger("TestUser", "password");
             File testFile = new File("test_passenger.tmp");
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(testFile));
-            oos.writeObject(testPassenger);
-            oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(testFile))) {
+                oos.writeObject(testPassenger);
+            }
             System.out.println("Passenger serialization test PASSED");
             testFile.delete();
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Passenger serialization test FAILED: " + e.getMessage());
-            e.printStackTrace();
         }
         
         System.out.println("\nTesting Booking serialization...");
@@ -307,21 +300,21 @@ public class BookingDAO {
             Booking testBooking = new Booking(testPassenger, testFlight);
             
             File testFile = new File("test_booking.tmp");
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(testFile));
-            oos.writeObject(testBooking);
-            oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(testFile))) {
+                oos.writeObject(testBooking);
+            }
             System.out.println("Booking serialization test PASSED");
             
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(testFile));
-            Booking deserializedBooking = (Booking) ois.readObject();
-            ois.close();
+            Booking deserializedBooking;
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(testFile))) {
+                deserializedBooking = (Booking) ois.readObject();
+            }
             System.out.println("Booking deserialization test PASSED");
             System.out.println("Deserialized booking ID: " + deserializedBooking.getId());
             
             testFile.delete();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.out.println("Booking serialization/deserialization test FAILED: " + e.getMessage());
-            e.printStackTrace();
         }
         
         System.out.println("\nTesting full save and reload cycle...");

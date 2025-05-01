@@ -1,14 +1,10 @@
 package airlineapp;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-import airlineapp.DAO.FlightDAO;
-import airlineapp.DAO.PassengerDAO;
 import airlineapp.console.MainMenu;
 
 public class Main {
@@ -23,16 +19,6 @@ public class Main {
         
         MainMenu mainMenu = new MainMenu(terminal);
         mainMenu.display_login_and_register_screen();
-
-        LocalDateTime dateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        String formattedDateTime = dateTime.format(formatter); 
-
-        PassengerDAO passengerDAO = new PassengerDAO();
-        
-        FlightDAO flightDAO = new FlightDAO();
-
-
         while (true) {
             int key = terminal.reader().read();
             switch (key) {
